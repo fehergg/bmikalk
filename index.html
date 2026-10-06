@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="hu">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="#f3f5f2">
+	<title>BMI-kalkulátor</title>
+	<style>
+		:root {
+			color-scheme: light;
+			--ink: #192d28;
+			--muted: #64736d;
+			--paper: #f3f5f2;
+			--white: #fff;
+			--line: #d9e0db;
+			--green: #176b52;
+			--green-dark: #104b3b;
+			--lime: #d6ef8a;
+			--coral: #bd5039;
+		}
+
+		* { box-sizing: border-box; }
+
+		body {
+			margin: 0;
+			background: var(--paper);
+			color: var(--ink);
+			font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+			line-height: 1.55;
+		}
+
+		.topbar {
+			min-height: 64px;
+			display: flex;
+			align-items: center;
+			border-bottom: 1px solid var(--line);
+			background: var(--white);
+		}
+
+		.topbar-inner, main {
+			width: min(100% - 40px, 1000px);
+			margin-inline: auto;
+		}
+
+		.brand {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			font-size: 15px;
+			font-weight: 700;
+		}
+
+		.brand-mark {
+			width: 30px;
+			height: 30px;
+			display: grid;
+			place-items: center;
+			border-radius: 8px;
+			background: var(--green);
+			color: white;
+			font-size: 13px;
+		}
+
+		main { padding-block: 44px 64px; }
+
+		.intro { margin-bottom: 28px; }
+
+		.eyebrow {
+			margin: 0 0 8px;
+			color: var(--green);
+			font-size: 12px;
+			font-weight: 700;
+			text-transform: uppercase;
+		}
+
+		h1 {
+			margin: 0;
+			font-family: Georgia, "Times New Roman", serif;
+			font-size: clamp(32px, 6vw, 48px);
+			font-weight: 500;
+			line-height: 1.12;
+		}
+
+		.intro p:last-child {
+			max-width: 590px;
+			margin: 12px 0 0;
+			color: var(--muted);
+		}
+
+		.calculator {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) minmax(240px, .72fr);
+			overflow: hidden;
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			background: var(--white);
+		}
+
+		.form-side { padding: 28px; }
+
+		h2 {
+			margin: 0 0 20px;
+			font-size: 19px;
+			line-height: 1.3;
+		}
+
+		.fields {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 16px;
+		}
+
+		label {
+			display: block;
+			margin-bottom: 7px;
+			font-size: 13px;
+			font-weight: 700;
+		}
+
+		.input-wrap { position: relative; }
+
+		input {
+			width: 100%;
+			min-height: 48px;
+			padding: 10px 44px 10px 12px;
+			border: 1px solid #bac7bf;
+			border-radius: 5px;
+			background: white;
+			color: var(--ink);
+			font: inherit;
+			font-size: 16px;
+		}
+
+		input:focus-visible, button:focus-visible {
+			outline: 3px solid #91c9ad;
+			outline-offset: 2px;
+		}
+
+		.unit {
+			position: absolute;
+			top: 50%;
+			right: 12px;
+			transform: translateY(-50%);
+			color: var(--muted);
+			font-size: 13px;
+			pointer-events: none;
+		}
+
+		button {
+			min-height: 48px;
+			margin-top: 20px;
+			padding: 0 20px;
+			border: 0;
+			border-radius: 5px;
+			background: var(--green);
+			color: white;
+			font: inherit;
+			font-weight: 700;
+			cursor: pointer;
+			transition: background-color 150ms ease, transform 150ms ease;
+		}
+
+		button:hover { background: var(--green-dark); }
+		button:active { transform: translateY(1px); }
+
+		.result-side {
+			min-height: 220px;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			padding: 28px;
+			background: var(--green-dark);
+			color: white;
+		}
+
+		.result-label {
+			margin: 0 0 4px;
+			color: #c6d8d0;
+			font-size: 13px;
+		}
+
+		.result-value {
+			margin: 0;
+			color: var(--lime);
+			font-family: Georgia, "Times New Roman", serif;
+			font-size: 54px;
+			line-height: 1.1;
+		}
+
+		.result-category {
+			margin: 8px 0 0;
+			font-size: 18px;
+			font-weight: 700;
+		}
+
+		.result-note {
+			margin: 10px 0 0;
+			color: #c6d8d0;
+			font-size: 12px;
+		}
+
+		.result-side[data-empty="true"] .result-value {
+			color: #d9e5df;
+			font-size: 32px;
+		}
+
+		.message {
+			min-height: 24px;
+			margin: 10px 0 0;
+			color: var(--coral);
+			font-size: 13px;
+		}
+
+		@media (max-width: 640px) {
+			.topbar-inner, main { width: min(100% - 28px, 1000px); }
+			main { padding-block: 32px 48px; }
+			.calculator { grid-template-columns: 1fr; }
+			.form-side, .result-side { padding: 22px; }
+			.result-side { min-height: 190px; }
+		}
+
+		@media (max-width: 420px) {
+			.fields { grid-template-columns: 1fr; gap: 12px; }
+		}
+
+		body {
+			background: #e4f7fc;
+			color: #111;
+			font-family: Georgia, "Times New Roman", serif;
+			line-height: 1.2;
+		}
+
+		.topbar { display: none; }
+
+		main {
+			width: 100%;
+			padding: 40px 14px 48px;
+		}
+
+		.calculator {
+			display: block;
+			width: min(100%, 244px);
+			margin: 0 auto;
+			overflow: visible;
+			border: 0;
+			border-radius: 0;
+			background: #fff;
+		}
+
+		.intro {
+			margin: 0;
+			padding: 0 5px 10px;
+			text-align: center;
+		}
+
+		.eyebrow, .intro p:last-child, .form-side h2, .result-label { display: none; }
+
+		h1 {
+			font-size: 30px;
+			font-weight: 700;
+			line-height: 1.15;
+			white-space: nowrap;
+		}
+
+		.form-side { padding: 0 7px; }
+
+		.fields {
+			display: grid;
+			grid-template-columns: 1fr;
+			gap: 3px;
+		}
+
+		.fields > div {
+			display: grid;
+			grid-template-columns: 1fr 78px;
+			align-items: center;
+			gap: 4px;
+		}
+
+		label {
+			margin: 0;
+			font-size: 14px;
+			font-weight: 400;
+			line-height: 1.2;
+			text-align: right;
+			white-space: nowrap;
+		}
+
+		input {
+			width: 78px;
+			min-height: 24px;
+			padding: 1px 5px;
+			border: 1px solid #888;
+			border-radius: 3px;
+			font-family: Arial, sans-serif;
+			font-size: 13px;
+		}
+
+		.unit { display: none; }
+
+		button {
+			display: block;
+			min-height: 24px;
+			margin: 4px auto 0;
+			padding: 0 8px;
+			border: 1px solid #aaa;
+			border-radius: 3px;
+			background: #eee;
+			color: #111;
+			font-family: Arial, sans-serif;
+			font-size: 13px;
+			font-weight: 400;
+		}
+
+		button:hover { background: #e4e4e4; }
+
+		.message {
+			min-height: 0;
+			margin: 4px 0 0;
+			font-family: Arial, sans-serif;
+			font-size: 11px;
+			text-align: center;
+		}
+
+		.result-side {
+			min-height: 0;
+			padding: 2px 8px 4px;
+			background: #fff;
+			color: #111;
+			text-align: center;
+		}
+
+		.result-category {
+			margin: 0;
+			font-size: 14px;
+			font-weight: 400;
+		}
+
+		.result-value {
+			margin: 0;
+			color: inherit;
+			font-family: inherit;
+			font-size: 14px;
+			line-height: 1.2;
+		}
+
+		.result-note { display: none; }
+
+		@media (max-width: 420px) {
+			main { padding-top: 32px; }
+			h1 { font-size: 28px; }
+		}
+	</style>
+	<script src="kalkulator.js" defer></script>
+</head>
+<body>
+	<header class="topbar">
+		<div class="topbar-inner">
+			<div class="brand"><span class="brand-mark" aria-hidden="true">BMI</span><span>Egészség kalkulátor</span></div>
+		</div>
+	</header>
+
+	<main>
+		<section class="calculator" aria-labelledby="page-title">
+			<div class="intro">
+				<h1 id="page-title">BMI-kalkulátor</h1>
+			</div>
+			<div class="form-side">
+				<form id="bmi-form" novalidate>
+					<div class="fields">
+						<div>
+							<label for="height">Magasság (cm)</label>
+							<div class="input-wrap">
+								<input id="height" name="height" type="number" min="0" step="any" inputmode="decimal" value="180" required>
+								<span class="unit" aria-hidden="true">cm</span>
+							</div>
+						</div>
+						<div>
+							<label for="weight">Testsúly (kg)</label>
+							<div class="input-wrap">
+								<input id="weight" name="weight" type="number" min="0" step="any" inputmode="decimal" value="65" required>
+								<span class="unit" aria-hidden="true">kg</span>
+							</div>
+						</div>
+					</div>
+					<button type="submit">BMI kiszámítása</button>
+					<p id="form-message" class="message" role="alert"></p>
+				</form>
+			</div>
+
+			<div id="result" class="result-side" aria-live="polite" aria-atomic="true">
+				<p id="bmi-category" class="result-category">Az állapotod: Normál testsúly</p>
+				<p class="result-value">(BMI: <span id="bmi-value">20.1</span>)</p>
+			</div>
+		</section>
+	</main>
+</body>
+</html>
